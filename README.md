@@ -28,5 +28,5 @@ Hosted URL of the Running Application
 https://datascrapex-job3-1070255625225.us-central1.run.app
 
 **Login Details to Admin Dashboard**
-email=admin2@test.com
+email="admin2@test.com"
 password=admin123
