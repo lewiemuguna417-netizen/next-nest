@@ -7,23 +7,23 @@ The full project directory from the PAXFORM environment has been included to dem
 
 **Key Technical Decisions Made**
 
-Adopted a clean Next.js architecture and modular file structure
+- Adopted a clean Next.js architecture and modular file structure
 
-Optimized Docker multi-stage builds for a minimal Cloud Run image size
+- Optimized Docker multi-stage builds for a minimal Cloud Run image size
 
-Configured production environment with strict environment variables
+- Configured production environment with strict environment variables
 
-Implemented CORS, Helmet, and security headers for hardened deployment
+- Implemented CORS, Helmet, and security headers for hardened deployment
 
-Structured API interactions with consistent versioned routing
+- Structured API interactions with consistent versioned routing
 
-Implemented reusable UI components and scalable folder organization
+- Implemented reusable UI components and scalable folder organization
 
-Enabled Cloud Run deployment with zero-downtime rollout
+- Enabled Cloud Run deployment with zero-downtime rollout
 
-Used a centralized configuration pattern for reliability and maintainability
+- Used a centralized configuration pattern for reliability and maintainability
 
-Hosted URL of the Running Application
+- Hosted URL of the Running Application
 
 https://datascrapex-job3-1070255625225.us-central1.run.app
 
