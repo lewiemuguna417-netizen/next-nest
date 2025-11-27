@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  paxform:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      # JWT Secret (use a secure secret in production)
+      - JWT_SECRET=d3a5e7c9b2f4a1d8e6c3b9a7d2f5e8c1b4a6d9e2f7c5b8a3d1e6f9c2b5a8d4e7
+      # Database URL (update for your database)
+      - DATABASE_URL=postgresql://neondb_owner:npg_WAw94UlzxQJY@ep-late-butterfly-a4of6k3z-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+      # API URLs (production backend)
+      - VITE_BACKEND_URL=https://datascrapex-job3-1070255625225.us-central1.run.app
+      - VITE_API_URL=https://datascrapex-job3-1070255625225.us-central1.run.app/api/v1
+      # Security settings
+      - COOKIE_SECURE=true
+      - COOKIE_HTTPONLY=true
+      - COOKIE_SAMESITE=lax
+      # CORS settings
+      - CORS_ORIGIN=https://datascrapex-job3-1070255625225.us-central1.run.app
+      - CORS_CREDENTIALS=true
+    volumes:
+      - paxform_uploads:/app/uploads
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.paxform.rule=Host(`your-domain.com`)"
+      - "traefik.http.routers.paxform.tls=true"
+      - "traefik.http.routers.paxform.tls.certresolver=letsencrypt"
+
+  # Optional: Local PostgreSQL database for development
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=paxform
+      - POSTGRES_USER=paxform_user
+      - POSTGRES_PASSWORD=secure_password_123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    profiles:
+      - local-db  # Use with: docker-compose --profile local-db up
+
+  # Optional: Redis for session storage and caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    profiles:
+      - cache  # Use with: docker-compose --profile cache up
+
+  # Nginx reverse proxy (recommended for production)
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - paxform_uploads:/var/www/uploads:ro
+    depends_on:
+      - paxform
+    restart: unless-stopped
+    profiles:
+      - proxy  # Use with: docker-compose --profile proxy up
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  paxform_uploads:
+    driver: local
+
+networks:
+  default:
+    name: paxform_network
